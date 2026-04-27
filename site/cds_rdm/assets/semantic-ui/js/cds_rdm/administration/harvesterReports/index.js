@@ -10,7 +10,7 @@ import { NotificationController } from "@js/invenio_administration";
 import { SearchFacets } from "@js/invenio_administration";
 import { SearchBar } from "react-searchkit";
 import { SearchResultItemLayout } from "@js/invenio_app_rdm/administration/auditLogs/search";
-import { AuditLogActions } from "@js/invenio_app_rdm/administration/auditLogs/AuditLogActions";
+import { AuditLogActions } from "./AuditLogActions";
 import { HarvesterSearchBarElement } from "./SearchBar";
 import { CustomEmptyResults } from "./EmptyResults";
 
