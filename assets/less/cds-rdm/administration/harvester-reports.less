@@ -54,3 +54,57 @@
     margin-top: 0.2em;
   }
 }
+
+.harvester-report-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 0.25rem;
+
+  > .ui.button {
+    flex: 0 0 auto;
+    margin: 0 !important;
+  }
+}
+
+.ui.grid .column.harvester-report-actions-col {
+  padding-right: 1.25rem;
+}
+
+.harvester-run-report-meta {
+  margin-top: 0.15rem !important;
+}
+
+.harvester-run-log-grid {
+  margin-top: 1rem;
+}
+
+.harvester-run-success-message {
+  white-space: normal;
+  text-align: left;
+}
+
+// Job run report: wrap long lines; scroll region height (matches admin log-table intent)
+.harvester-run-log-report {
+  width: 100%;
+
+  .harvester-run-log-table.log-table {
+    max-height: calc(100vh - 11rem);
+    overflow-x: hidden;
+  }
+
+  .harvester-run-log-segment {
+    overflow-x: hidden;
+  }
+
+  .log-line .log-message {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

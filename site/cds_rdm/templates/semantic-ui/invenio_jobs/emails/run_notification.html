@@ -46,7 +46,7 @@ Context variables:
     <div style="margin-bottom: 15px;">
         <a href="{{ config.SITE_UI_URL }}/harvester-reports/download?q={{ timestamp_range | urlencode }}&action=record.publish"
             style="display: inline-block; padding: 10px 20px; background-color: #2185d0; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">
-            Download Harvester Logs
+            Download error log
         </a>
         <p style="font-size: 12px; color: #999; margin-top: 5px;">
             Download all record.publish audit logs from this harvest run
@@ -57,7 +57,7 @@ Context variables:
     <div style="margin-bottom: 15px;">
         <a href="{{ config.SITE_UI_URL }}/administration/harvester-reports?q={{ timestamp_range | urlencode }}&l=list&p=1&s=20&sort=newest"
             style="display: inline-block; padding: 10px 20px; background-color: #21ba45; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">
-            View Harvester Reports
+            View list of changes
         </a>
         <p style="font-size: 12px; color: #999; margin-top: 5px;">
             View detailed audit reports for all harvester runs

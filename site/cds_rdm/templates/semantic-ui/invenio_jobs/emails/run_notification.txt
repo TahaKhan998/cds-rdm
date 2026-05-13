@@ -25,10 +25,10 @@ Harvester Actions:
 {% set end_time = (run.finished_at | string | replace(' ', 'T')) if run.finished_at else '*' %}
 {% set timestamp_range = "@timestamp:[" ~ start_time ~ " TO " ~ end_time ~ "]" %}
 
-Download Harvester Logs:
+Download error log:
 {{ config.SITE_UI_URL }}/harvester-reports/download?q={{ timestamp_range | urlencode }}&action=record.publish
 
-View Harvester Reports:
+View list of changes:
 {{ config.SITE_UI_URL }}/administration/harvester-reports?q={{ timestamp_range | urlencode }}&l=list&p=1&s=20&sort=newest
 
 {% endif %}

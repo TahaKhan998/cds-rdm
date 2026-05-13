@@ -8,7 +8,7 @@
 
 """CDS views."""
 
-from flask import Blueprint, current_app, render_template, url_for
+from flask import Blueprint, current_app, jsonify, render_template, url_for
 from flask_principal import AnonymousIdentity
 from invenio_access.permissions import any_user
 from invenio_app_rdm.records_ui.utils import dump_external_resource
@@ -45,9 +45,28 @@ def create_cds_clc_sync_bp(app):
 
 
 def create_harvester_download_bp(app):
-    """Create harvester download blueprint."""
+    """Harvester log download blueprint and colored HTML report page."""
+    from cds_rdm.administration.permissions import curators_permission
+
     ext = app.extensions["cds-rdm"]
-    return ext.harvester_download_resource.as_blueprint()
+    bp = ext.harvester_download_resource.as_blueprint()
+
+    report_bp = Blueprint("cds_rdm_harvester_report_page", __name__)
+
+    @report_bp.route("/administration/harvester-reports/<uuid:run_id>/report")
+    @curators_permission.require(http_exception=403)
+    def harvester_run_report(run_id):
+        ctx, err = ext.harvester_download_resource.report_template_context(str(run_id))
+        if err:
+            body, code = err
+            return jsonify(body), code
+        return render_template(
+            "cds_rdm/administration/harvester_run_report.html",
+            **ctx,
+        )
+
+    app.register_blueprint(report_bp)
+    return bp
 
 
 def inspire_link_render(record):
