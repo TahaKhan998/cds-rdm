@@ -10,11 +10,12 @@ import { NotificationController } from "@js/invenio_administration";
 import { SearchFacets } from "@js/invenio_administration";
 import { SearchBar } from "react-searchkit";
 import { SearchResultItemLayout } from "@js/invenio_app_rdm/administration/auditLogs/search";
-import { AuditLogActions } from "@js/invenio_app_rdm/administration/auditLogs/AuditLogActions";
+import { HarvesterAuditLogActions } from "./AuditLogActions";
 import { HarvesterSearchBarElement } from "./SearchBar";
 import { CustomEmptyResults } from "./EmptyResults";
 
 const domContainer = document.getElementById("invenio-search-config");
+
 if (domContainer) {
   const defaultComponents = initDefaultSearchComponents(domContainer);
 
@@ -22,7 +23,7 @@ if (domContainer) {
     ...defaultComponents,
     "InvenioAdministration.SearchResultItem.layout": SearchResultItemLayout,
     "SearchApp.facets": SearchFacets,
-    "InvenioAdministration.ResourceActions": AuditLogActions,
+    "InvenioAdministration.ResourceActions": HarvesterAuditLogActions,
     "SearchBar.element": HarvesterSearchBarElement,
     "EmptyResults.element": CustomEmptyResults,
     "SearchApp.searchbarContainer": SearchBar,
@@ -30,9 +31,9 @@ if (domContainer) {
 
   createSearchAppInit(
     overriddenComponents,
-    true, // autoInit
+    true,
     "invenio-search-config",
-    false, // searchApiAvailable
+    false,
     NotificationController
   );
 }

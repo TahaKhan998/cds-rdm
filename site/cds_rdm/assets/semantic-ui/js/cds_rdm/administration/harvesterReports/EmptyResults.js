@@ -8,19 +8,18 @@ import React from "react";
 import { Segment, Header, Icon } from "semantic-ui-react";
 import { i18next } from "@translations/invenio_administration/i18next";
 
-/**
- * Custom Empty Results component (without showing the query)
- */
-export const CustomEmptyResults = () => {
-  return (
-    <Segment placeholder textAlign="center" className="harvester-empty-results">
-      <Header icon>
-        <Icon name="search" />
-        {i18next.t("No logs found")}
-      </Header>
-      <Segment.Inline>
-        <p>{i18next.t("No logs match your current filters. Try selecting a different run or adjusting your search.")}</p>
-      </Segment.Inline>
-    </Segment>
-  );
-};
+export const CustomEmptyResults = () => (
+  <Segment placeholder textAlign="center" className="harvester-empty-results">
+    <Header icon>
+      <Icon name="search" />
+      {i18next.t("No logs found")}
+    </Header>
+    <Segment.Inline>
+      <p>
+        {i18next.t(
+          "No logs match your current filters. Try selecting a different run or adjusting your search."
+        )}
+      </p>
+    </Segment.Inline>
+  </Segment>
+);

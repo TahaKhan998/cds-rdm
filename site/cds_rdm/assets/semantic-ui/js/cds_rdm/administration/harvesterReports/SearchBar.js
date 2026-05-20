@@ -9,32 +9,34 @@ import { withState, Sort } from "react-searchkit";
 import { Input, Dropdown, Grid, Header, Label, Icon } from "semantic-ui-react";
 import { SearchConfigurationContext } from "@js/invenio_search_ui/components";
 import { i18next } from "@translations/invenio_administration/i18next";
-import { buildTimestampFilter, extractRunIdFromQuery, getStatusColor, getStatusIcon, formatRunOption } from "./utils";
+import {
+  buildTimestampFilter,
+  extractRunIdFromQuery,
+  getStatusColor,
+  getStatusIcon,
+  formatRunOption,
+} from "./utils";
 import { DownloadButton } from "./DownloadButton";
 
-/**
- * Custom SearchBar component with run selector
- */
 const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
   const hiddenParams = [
     ["action", "record.publish"],
     ["user_id", "system"],
   ];
 
-  // Get runs from data attributes
   const domContainer = document.getElementById("invenio-search-config");
   const runs = JSON.parse(domContainer?.dataset.harvesterRuns || "[]");
   const defaultRun = JSON.parse(domContainer?.dataset.defaultRun || "null");
 
   const { sortOptions, sortOrderDisabled } = useContext(SearchConfigurationContext);
 
-  // Derive selected run from the timestamp in the current query — null if user typed a custom range
   const runIdFromQuery = extractRunIdFromQuery(currentQueryState.queryString, runs);
   const selectedRun = runs.find((r) => r.id === runIdFromQuery) || null;
 
-  const [inputValue, setInputValue] = React.useState(currentQueryState.queryString || "");
+  const [inputValue, setInputValue] = React.useState(
+    currentQueryState.queryString || ""
+  );
 
-  // Auto-select default run on mount only if there is no existing query
   React.useEffect(() => {
     if (!currentQueryState.queryString && defaultRun) {
       executeSearch(defaultRun, "");
@@ -72,15 +74,13 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return i18next.t("N/A");
-    const date = new Date(dateStr);
-    return date.toLocaleString();
+    return new Date(dateStr).toLocaleString();
   };
 
   const calculateDuration = (start, end) => {
     if (!start || !end) return i18next.t("Running...");
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const durationMs = endDate - startDate;
+
+    const durationMs = new Date(end) - new Date(start);
     const seconds = Math.floor(durationMs / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -99,6 +99,7 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
       Q: i18next.t("QUEUED"),
       P: i18next.t("PARTIAL SUCCESS"),
     };
+
     return statusMap[status?.toUpperCase()] || status?.toUpperCase() || i18next.t("UNKNOWN");
   };
 
@@ -121,7 +122,6 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
           {selectedRun && (
             <div className="harvester-run-details">
               <div className="details-row">
-                {/* Status */}
                 <div>
                   <Label color={getStatusColor(selectedRun.status)} size="small">
                     <Icon name={getStatusIcon(selectedRun.status)} />
@@ -129,19 +129,16 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
                   </Label>
                 </div>
 
-                {/* Duration */}
                 <div className="detail-item">
                   <Icon name="clock outline" color="grey" size="small" />
                   <span>{calculateDuration(selectedRun.started_at, selectedRun.finished_at)}</span>
                 </div>
 
-                {/* Started */}
                 <div className="detail-item">
                   <Icon name="play circle" color="grey" size="small" />
                   <span>{formatDate(selectedRun.started_at)}</span>
                 </div>
 
-                {/* Finished */}
                 {selectedRun.finished_at && (
                   <div className="detail-item">
                     <Icon name="stop circle" color="grey" size="small" />
@@ -150,7 +147,6 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
                 )}
               </div>
 
-              {/* Message on separate line if exists */}
               {selectedRun.message && (
                 <div className="run-message">
                   <Icon name="info circle" color="grey" size="small" />
@@ -171,10 +167,10 @@ const SearchBarComponent = ({ updateQueryState, currentQueryState }) => {
               color: "primary",
             }}
             fluid
-            placeholder={i18next.t("Search or enter custom @timestamp:[\"from\" TO \"to\"] range...")}
-            onChange={(_, { value }) => {
-              setInputValue(value);
-            }}
+            placeholder={i18next.t(
+              "Search or enter custom @timestamp:[\"from\" TO \"to\"] range..."
+            )}
+            onChange={(_, { value }) => setInputValue(value)}
             value={inputValue}
             onKeyPress={(event) => {
               if (event.key === "Enter") {

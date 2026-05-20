@@ -14,13 +14,11 @@ const DownloadButtonComponent = ({ currentQueryState }) => {
   const domContainer = document.getElementById("invenio-search-config");
   const runs = JSON.parse(domContainer?.dataset.harvesterRuns || "[]");
 
-  const runId = extractRunIdFromQuery(
-    currentQueryState.queryString || "",
-    runs
-  );
+  const runId = extractRunIdFromQuery(currentQueryState.queryString || "", runs);
 
   const handleDownload = () => {
     if (!runId) return;
+
     const params = new URLSearchParams({ run_id: runId });
     window.location.href = `/harvester-reports/download?${params.toString()}`;
   };
