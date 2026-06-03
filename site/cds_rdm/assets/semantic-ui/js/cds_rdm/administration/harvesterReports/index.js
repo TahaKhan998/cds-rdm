@@ -8,7 +8,6 @@ import { initDefaultSearchComponents } from "@js/invenio_administration";
 import { createSearchAppInit } from "@js/invenio_search_ui";
 import { NotificationController } from "@js/invenio_administration";
 import { SearchFacets } from "@js/invenio_administration";
-import { SearchBar } from "react-searchkit";
 import { SearchResultItemLayout } from "@js/invenio_app_rdm/administration/auditLogs/search";
 import { AuditLogActions } from "@js/invenio_app_rdm/administration/auditLogs/AuditLogActions";
 import { HarvesterSearchBarElement } from "./SearchBar";
@@ -25,7 +24,6 @@ if (domContainer) {
     "InvenioAdministration.ResourceActions": AuditLogActions,
     "SearchBar.element": HarvesterSearchBarElement,
     "EmptyResults.element": CustomEmptyResults,
-    "SearchApp.searchbarContainer": SearchBar,
   };
 
   createSearchAppInit(

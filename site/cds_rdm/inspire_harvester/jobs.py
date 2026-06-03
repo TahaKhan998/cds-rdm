@@ -49,7 +49,7 @@ class InspireArgsSchema(PredefinedArgsSchema):
         since = data.get("since")
         until = data.get("until")
 
-        if since and until and since > until:
+        if since and until and since.date() > until:
             error_message = (
                 f"Validation failed. The 'Since' date must be earlier than or equal to the 'Until' date. "
                 f"'Since' value: {since}, 'Until' value: {until}."
