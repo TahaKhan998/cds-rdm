@@ -20,6 +20,11 @@ from .schemes import legacy_cds_pattern
 blueprint = Blueprint("cds-rdm_ext", __name__)
 
 
+def create_blueprint(app):
+    """Create CDS blueprint."""
+    return blueprint
+
+
 def frontpage_view_function():
     """Frontpage."""
     anonymous_identity = AnonymousIdentity()
@@ -161,5 +166,4 @@ def get_linked_records_search_query(record):
     final_query = f'({combined_query}) AND is_published:true AND NOT id:"{record_id}"'
 
     return final_query
-
 

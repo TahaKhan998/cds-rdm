@@ -1,0 +1,32 @@
+{#
+    Copyright (C) 2026 CERN.
+
+    CDS-RDM is free software; you can redistribute it and/or modify it
+    under the terms of the GPL-2.0 License; see LICENSE file for more details.
+#}
+
+{% extends config.THEME_404_TEMPLATE %}
+
+{% block message %}
+  <h1><i class="bolt icon"></i> {{ _('File not in latest record version') }}</h1>
+  <p>
+    {{
+      _('The latest record version does not contain "%(file)s".', file=filename)
+    }}
+  </p>
+  <p>
+    {{
+      _('You can still open the latest record version that contains this file.')
+    }}
+  </p>
+  <p>
+    <a href="{{ fallback_record_url }}">
+      {{ _('Open the latest record version that contains this file') }}
+    </a>
+  </p>
+  <p>
+    <a href="{{ latest_record["links"]["self_html"] }}">
+      {{ _('View the latest record version') }}
+    </a>
+  </p>
+{% endblock message %}
