@@ -12,6 +12,7 @@ from flask import current_app
 from flask_principal import RoleNeed, UserNeed
 from invenio_access import action_factory
 from invenio_access.permissions import Permission
+from invenio_accounts.proxies import current_datastore
 from invenio_rdm_records.services.generators import AccessGrant
 from invenio_records_permissions.generators import AuthenticatedUser, Generator
 from invenio_search.engine import dsl
@@ -20,6 +21,7 @@ from .administration.permissions import harvester_admin_access_action
 
 archiver_read_all_role = RoleNeed("archiver-read-all")
 archiver_notification_role = RoleNeed("archiver-notification")
+inspire_harvester_role = RoleNeed("inspire-harvester")
 
 clc_sync_action = action_factory("clc-sync")
 clc_sync_permission = Permission(clc_sync_action)
@@ -68,7 +70,10 @@ class AuthenticatedRegularUser(AuthenticatedUser):
     def excludes(self, **kwargs):
         """Exclude service/robot accounts."""
         excludes = super().excludes(**kwargs)
-        return excludes + [archiver_read_all_role, archiver_notification_role]
+        return excludes + [
+            archiver_read_all_role,
+            archiver_notification_role,
+        ]
 
 
 class ArchiverRole(Generator):
@@ -110,6 +115,14 @@ class ArchiverNotification(ArchiverRole):
         return archiver_notification_role
 
 
+class InspireHarvester(Generator):
+    """Allows by inspire-harvester role."""
+
+    def needs(self, **kwargs):
+        """Enabling Needs."""
+        return [inspire_harvester_role]
+
+
 class HarvesterCurator(Generator):
     """Allows harvester curators via the harvester admin action."""
 
@@ -118,12 +131,19 @@ class HarvesterCurator(Generator):
         return [harvester_admin_access_action]
 
     def query_filter(self, identity=None, **kwargs):
-        """Restrict harvester curators to system-user ``record.publish`` audit logs."""
+        """Filter to harvester and legacy system publish audit logs."""
         if identity and Permission(harvester_admin_access_action).allows(identity):
+            user_ids = ["system"]
+            email = current_app.config.get("CDS_HARVESTER_USER_EMAIL")
+            if email:
+                user = current_datastore.get_user_by_email(email)
+                if user is not None:
+                    user_ids.append(str(user.id))
+
             return dsl.Q(
                 "bool",
                 must=[
-                    dsl.Q("term", **{"user.id": "system"}),
+                    dsl.Q("terms", **{"user.id": user_ids}),
                     dsl.Q("term", action="record.publish"),
                 ],
             )

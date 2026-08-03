@@ -10,7 +10,6 @@
 from copy import deepcopy
 
 from flask import current_app
-from invenio_access.permissions import system_identity
 from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_vocabularies.datastreams.errors import WriterError
 from invenio_vocabularies.datastreams.writers import BaseWriter
@@ -24,6 +23,7 @@ from cds_rdm.inspire_harvester.logger import (
     format_validation_error,
     hlog,
 )
+from cds_rdm.inspire_harvester.service_user import HarvesterUser
 from cds_rdm.inspire_harvester.update.config import (
     CDS_ORIGINAL_RECORD_UPDATE_STRATEGY_CONFIG,
     UPDATE_STRATEGY_CONFIG,
@@ -42,9 +42,12 @@ class InspireWriter(BaseWriter):
 
     def __init__(self):
         """Constructor."""
-        self.matcher = RecordMatcher()
-        self.drafts = DraftLifecycleManager()
-        self.file_sync = FileSynchronizer(draft_lifecycle=self.drafts)
+        self.harvester_user = HarvesterUser().get()
+        self.matcher = RecordMatcher(self.harvester_user.identity)
+        self.drafts = DraftLifecycleManager(self.harvester_user.identity)
+        self.file_sync = FileSynchronizer(
+            draft_lifecycle=self.drafts, identity=self.harvester_user.identity
+        )
 
     def write(self, stream_entry, *args, **kwargs):
         """Create or update the record in CDS."""
@@ -114,7 +117,7 @@ class InspireWriter(BaseWriter):
         """Dispatch to in-place edit or new-version based on file/DOI state."""
         entry = {k: v for k, v in stream_entry.entry.items() if k != "_inspire_ctx"}
         ctx = stream_entry.entry["_inspire_ctx"]
-        record = current_rdm_records_service.read(system_identity, record_pid)
+        record = current_rdm_records_service.read(self.harvester_user.identity, record_pid)
         record_dict = record.to_dict()
 
         should_update_files = self.file_sync.check_files_should_update(
@@ -172,7 +175,7 @@ class InspireWriter(BaseWriter):
     def _resource_type_versioning(self, record, update_metadata, ctx, logger):
 
         search_result = current_rdm_records_service.scan_versions(
-            identity=system_identity,
+            identity=self.harvester_user.identity,
             id_=record.id,
         )
         existing_record_versions = {
@@ -187,7 +190,7 @@ class InspireWriter(BaseWriter):
             logger.info(f"Processing {incoming_resource_type} version")
             if incoming_resource_type in existing_record_versions:
                 version_record = current_rdm_records_service.read(
-                    system_identity, existing_record_versions[incoming_resource_type]
+                    self.harvester_user.identity, existing_record_versions[incoming_resource_type]
                 )
                 should_update_files = self.file_sync.check_files_should_update(
                     version_record, version, logger
@@ -208,7 +211,7 @@ class InspireWriter(BaseWriter):
         latest_record_version = current_rdm_records_service.record_cls.get_latest_published_by_parent(
             record._record.parent
         )
-        record = current_rdm_records_service.read(system_identity, latest_record_version["id"])
+        record = current_rdm_records_service.read(self.harvester_user.identity, latest_record_version["id"])
         # publish the latest version at the end
         self._publish_new_version(record, update_metadata, logger)
         logger.info(
@@ -282,7 +285,7 @@ class InspireWriter(BaseWriter):
 
             self.drafts.add_cern_research_community(draft)
         except Exception:
-            current_rdm_records_service.delete_draft(system_identity, draft.id)
+            current_rdm_records_service.delete_draft(self.harvester_user.identity, draft.id)
             logger.error(f"Draft {draft.id} is deleted due to errors.")
             raise
 

@@ -9,6 +9,8 @@
 from flask import current_app
 from invenio_vocabularies.datastreams.transformers import BaseTransformer
 
+from cds_rdm.inspire_harvester.service_user import HarvesterUser
+
 from .transform.transform_entry import RDMEntry
 
 
@@ -18,6 +20,7 @@ class InspireJsonTransformer(BaseTransformer):
     def __init__(self, root_element=None, *args, **kwargs):
         """Initializes the transformer."""
         self.root_element = root_element
+        self.harvester_user = HarvesterUser().get()
         super().__init__(*args, **kwargs)
 
     def apply(self, stream_entry, **kwargs):
@@ -25,7 +28,7 @@ class InspireJsonTransformer(BaseTransformer):
         current_app.logger.info("Start transformation of INSPIRE record to CDS record.")
         # assign original source record to the stream entry
         stream_entry.source_entry = stream_entry.entry
-        entry_builder = RDMEntry(stream_entry.entry)
+        entry_builder = RDMEntry(stream_entry.entry, self.harvester_user)
         rdm_entry, versions, cds_id, errors = entry_builder.build()
 
         if errors:
