@@ -7,9 +7,9 @@
 
 """Transformer module."""
 from flask import current_app
+from invenio_access.permissions import system_identity
+from invenio_users_resources.proxies import current_users_service
 from invenio_vocabularies.datastreams.transformers import BaseTransformer
-
-from cds_rdm.inspire_harvester.service_user import HarvesterUser
 
 from .transform.transform_entry import RDMEntry
 
@@ -20,7 +20,10 @@ class InspireJsonTransformer(BaseTransformer):
     def __init__(self, root_element=None, *args, **kwargs):
         """Initializes the transformer."""
         self.root_element = root_element
-        self.harvester_user = HarvesterUser().get()
+        email = current_app.config["CDS_HARVESTER_USER_EMAIL"]
+        self.harvester_user = current_users_service.read(
+            system_identity, email, id_type="email"
+        )
         super().__init__(*args, **kwargs)
 
     def apply(self, stream_entry, **kwargs):
