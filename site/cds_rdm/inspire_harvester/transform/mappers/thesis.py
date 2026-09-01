@@ -52,7 +52,7 @@ class ThesisPublicationDateMapper(MapperBase):
 class ThesisDefenceDateMapper(MapperBase):
     """Mapper for thesis defence date."""
 
-    id = "custom_fields.thesis:thesis.defense_date"
+    id = "custom_fields.thesis:thesis.date_defended"
 
     def map_value(self, src_record, ctx, logger):
         """Apply thesis field mapping."""

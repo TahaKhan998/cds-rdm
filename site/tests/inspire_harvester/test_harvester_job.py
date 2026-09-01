@@ -243,6 +243,7 @@ expected_result_2 = {
         "thesis:thesis": {
             "type": "PhD",
             "university": "University Grenoble Alpes",
+            "date_defended": "2014-05-05",
         },
     },
 }
@@ -327,6 +328,7 @@ expected_result_3 = {
         "thesis:thesis": {
             "type": "Bachelor",
             "university": "San Luis Potosi University",
+            "date_defended": "2024-06-03",
         },
     },
 }

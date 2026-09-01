@@ -19,9 +19,9 @@ class ThesisFieldUpdate(FieldUpdateBase):
     Strategy for `metadata.thesis:thesis` (InvenioRDM custom field style).
 
     Requirements:
-      - Allow updating `university` and `type` from incoming.
+      - Allow updating `university`, `type`, and `date_defended` from incoming.
       - Leave any keys that are missing in incoming intact on the current record
-        (e.g. keep current `date_defended`, `date_submitted` if incoming doesn't provide them).
+        (e.g. keep current `date_submitted` if incoming doesn't provide it).
       - Do not delete keys.
       - If incoming thesis object is missing entirely -> no-op.
 
@@ -30,7 +30,7 @@ class ThesisFieldUpdate(FieldUpdateBase):
       - If either side isn't a dict -> conflict.
     """
 
-    def __init__(self, updatable_keys=("university", "type")):
+    def __init__(self, updatable_keys=("university", "type", "date_defended")):
         """Initialize with the subset of thesis keys that may be overwritten from incoming."""
         self.updatable_keys = updatable_keys
 
@@ -83,7 +83,6 @@ class ThesisFieldUpdate(FieldUpdateBase):
             if k in inc_obj and inc_obj[k] not in (None, "", [], {}):
                 merged[k] = copy.deepcopy(inc_obj[k])
 
-        # Keep all other current keys as-is (including date_defended/date_submitted)
         updated = copy.deepcopy(current)
         set_path(updated, path, merged)
 
