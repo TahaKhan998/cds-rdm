@@ -12,6 +12,7 @@ from typing import List, Optional
 
 import requests
 from invenio_access.permissions import system_identity
+from invenio_pidstore.errors import PIDDeletedError
 from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_search.engine import dsl
 from invenio_vocabularies.datastreams.errors import WriterError
@@ -243,6 +244,13 @@ class RecordMatcher:
             except NoResultFound:
                 logger.debug(f"No lrecid in pidstore for {cds_id}.")
                 unresolved.append(cds_id)
+            except PIDDeletedError:
+                # lrecid still points at a parent whose recid is deleted.
+                # Fail clearly instead of crashing the async write task.
+                raise WriterError(
+                    "Matched legacy CDS record is deleted. "
+                    f"| details: recid={cds_id}"
+                )
 
         if matched_ids:
             if len(matched_ids) > 1:

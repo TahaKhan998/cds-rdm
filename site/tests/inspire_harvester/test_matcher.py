@@ -59,6 +59,24 @@ def test_matcher_finds_record_by_legacy_recid(
 
 @patch("cds_rdm.inspire_harvester.load.matcher.current_rdm_records_service.read_latest")
 @patch("cds_rdm.inspire_harvester.load.matcher.get_pid_by_legacy_recid")
+def test_matcher_errors_when_legacy_parent_is_deleted(
+    mock_get_pid, mock_read_latest, running_app
+):
+    """Deleted parent behind lrecid should be a harvest error, not a crash."""
+    from invenio_pidstore.errors import PIDDeletedError
+
+    matcher = RecordMatcher()
+    logger = Mock()
+    stream_entry = legacy_entry("2225217")
+    mock_get_pid.return_value = Mock(pid_value="a5gf5-g2737")
+    mock_read_latest.side_effect = PIDDeletedError(Mock(), None)
+
+    with pytest.raises(WriterError, match="Matched legacy CDS record is deleted"):
+        matcher.match(stream_entry, inspire_id="1432763", logger=logger)
+
+
+@patch("cds_rdm.inspire_harvester.load.matcher.current_rdm_records_service.read_latest")
+@patch("cds_rdm.inspire_harvester.load.matcher.get_pid_by_legacy_recid")
 def test_matcher_tries_each_legacy_cds_id_until_pidstore_hits(
     mock_get_pid, mock_read_latest, running_app
 ):
